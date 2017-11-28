@@ -13,6 +13,7 @@ struct lock_t
   char lstate;
   int lqueuehead;
   int lqueuetail;
+  int lid;
   int lholder;
   int lmaxprio;
   int ltype;
