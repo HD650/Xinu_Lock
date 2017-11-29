@@ -1,4 +1,6 @@
 #include <lock.h>
+#include <kernel.h>
+#include <proc.h>
 
 int ldelete(int ldes)
 {

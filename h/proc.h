@@ -26,6 +26,7 @@
 #define	PRSLEEP		'\005'		/* process is sleeping		*/
 #define	PRSUSP		'\006'		/* process is suspended		*/
 #define	PRWAIT		'\007'		/* process is on semaphore queue*/
+#define PLWAIT		'\011'		/* process is locked */
 #define	PRTRECV		'\010'		/* process is timing a receive	*/
 
 /* miscellaneous process definitions */

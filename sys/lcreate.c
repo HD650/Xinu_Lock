@@ -1,4 +1,6 @@
 #include <lock.h>
+#include <kernel.h>
+
 
 extern int g_lock_id;
 

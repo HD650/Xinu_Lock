@@ -17,7 +17,11 @@ struct lock_t
   int lholder;
   int lmaxprio;
   int ltype;
-}
+  int lnumr; //num of reader in this lock
+  int lnumw; //num of writer in this lock
+  int lnumh; //num of holder in this lock, if WRITE, it canonly be 0 or 1
+  int lmaxw; //max priority of write task in queue
+};
 
 extern struct lock_t g_locks[];
 extern int g_lock_id;

@@ -1,4 +1,5 @@
 #include <lock.h>
+#include <kernel.h>
 
 struct lock_t g_locks[NLOCKS];
 int g_lock_id;
@@ -17,5 +18,8 @@ void linit()
     g_locks[i].lid=-1;
     g_locks[i].lmaxprio=MININT;
     g_locks[i].ltype=DELETED;
+    g_locks[i].lnumw=0;
+    g_locks[i].lnumr=0;
+    g_locks[i].lnumh=0;
   }
 }
