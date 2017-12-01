@@ -20,6 +20,7 @@ int lcreate()
     {
       g_locks[index].lstate=LUSED;
       g_locks[index].lid=index;
+      
       break;
     }
     //update the global lock id

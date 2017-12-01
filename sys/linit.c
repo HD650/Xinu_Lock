@@ -21,5 +21,6 @@ void linit()
     g_locks[i].lnumw=0;
     g_locks[i].lnumr=0;
     g_locks[i].lnumh=0;
+    g_locks[i].lmaxw=MININT;
   }
 }

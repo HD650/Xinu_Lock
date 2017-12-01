@@ -81,6 +81,8 @@ int lock(int ldes, int type, int priority)
       //save the job type, so when wake this process, we can change the 
       //type of the lock
       q[currpid].qtype=type;
+      if(priority>g_locks[index].lmaxw)
+        g_locks[index].lmaxw=priority;
       //give out the cpu
       resched();
       restore(ps);

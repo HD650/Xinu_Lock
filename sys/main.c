@@ -16,5 +16,6 @@ int main()
         /* The hook to shutdown QEMU for process-like execution of XINU.
          * This API call terminates the QEMU process.
          */
-        shutdown();
+        releaseall(3,111,222,333,444);
+	shutdown();
 }
