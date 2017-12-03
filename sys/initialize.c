@@ -10,6 +10,7 @@
 #include <sleep.h>
 #include <mem.h>
 #include <tty.h>
+#include <lock.h>
 #include <q.h>
 #include <io.h>
 #include <stdio.h>
@@ -197,7 +198,7 @@ LOCAL int sysinit()
 	    init_dev(i);
 	}
 #endif
-
+	linit();
 	return(OK);
 }
 
