@@ -76,11 +76,27 @@ SYSCALL kill(int pid)
                 if(g_lock_table[p][l]==WAIT)
                   if(proctab[p].pprio>max||proctab[p].pprio<g_locks[l].lmaxprio)
                     max=proctab[p].pprio;
-              g_locks[l].lmaxprio=max;
+              //if the max is still MININT, means that there is no process 
+              //waiting in this lock
+              if(max==MININT)
+              {
+                //so restore the priority of the hold to defualt
+                int pp=0;
+                for(;pp<NPROC;pp++)
+                  if(g_lock_table[pp][l]==HOLD)
+                    chprio(pp,proctab[pp].poprio);
+              }
+              else
+                g_locks[l].lmaxprio=max;
               for(p=0;p<NPROC;p++)
                 if(g_lock_table[p][l]==HOLD)
                   chprio(p,max);
             }
+          }
+          //if this process hold some lock, release them
+          else if(g_lock_table[pid][l]==HOLD)
+          {
+            releaseall(1,l);
           }
         }
 	restore(ps);

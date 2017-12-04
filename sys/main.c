@@ -179,8 +179,9 @@ void test3 ()
 	kill (rd1);
 	sleep(1);
 	assert(getprio(wr1) == 20, "Test 3 failed");
+	
+	sleep(8);
 
-        sleep (8);
         kprintf ("Test 3 OK\n");
 }
 
