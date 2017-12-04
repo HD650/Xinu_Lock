@@ -20,6 +20,13 @@ int lcreate()
     {
       g_locks[index].lstate=LUSED;
       g_locks[index].lid=g_lock_id;
+      g_locks[index].lholder=-1;
+      g_locks[index].lmaxprio=MININT;
+      g_locks[index].ltype=DELETED;
+      g_locks[index].lnumr=0;
+      g_locks[index].lnumw=0;
+      g_locks[index].lnumh=0;
+      g_locks[index].lmaxw=MININT;
       res=g_lock_id;
       break;
     }

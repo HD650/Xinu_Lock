@@ -3,6 +3,8 @@
 #include <lock.h>
 #include <q.h>
 
+extern int g_lock_table[NPROC][NLOCKS];
+
 int lock(int ldes, int type, int priority)
 {
   STATWORD ps;
@@ -30,6 +32,13 @@ int lock(int ldes, int type, int priority)
       g_locks[index].lnumr++;
     else if(type==WRITE)
       g_locks[index].lnumw++;
+    //now this lock is held by currpro
+    g_lock_table[currpid][index]=HOLD;
+    //if some of the waiting processes has higher priority than this one
+    if(proctab[currpid].pprio<g_locks[index].lmaxprio)
+    {
+      chprio(currpid,g_locks[index].lmaxprio);
+    }
     restore(ps);
     return OK;
   }
@@ -48,6 +57,19 @@ int lock(int ldes, int type, int priority)
       //save the job type, so when wake this process, we can change the 
       //type of the lock
       q[currpid].qtype=READ;
+      g_lock_table[currpid][index]=WAIT;
+      //if this process is waiting, update the max priority in lock
+      if(proctab[currpid].pprio>g_locks[index].lmaxprio)
+      {
+        g_locks[index].lmaxprio=proctab[currpid].pprio;
+        //if the max priority of this lock is changed, update all holder
+        int p=0;
+        for(;p<NPROC;p++)
+        {
+          if(g_lock_table[p][index]==HOLD)
+            chprio(p,g_locks[index].lmaxprio);
+        }
+      }
       //give out the cpu
       resched();
       restore(ps);
@@ -64,6 +86,11 @@ int lock(int ldes, int type, int priority)
         g_locks[index].lholder=currpid;
         g_locks[index].lnumh++;
         g_locks[index].lnumr++;
+        g_lock_table[currpid][index]=HOLD;
+        if(proctab[currpid].pprio<g_locks[index].lmaxprio)
+        {
+          chprio(currpid,g_locks[index].lmaxprio);
+        }
         restore(ps);
         return OK;
       }
@@ -76,6 +103,17 @@ int lock(int ldes, int type, int priority)
         //save the job type, so when wake this process, we can change the 
         //type of the lock
         q[currpid].qtype=type;
+        g_lock_table[currpid][index]=WAIT;
+        if(proctab[currpid].pprio>g_locks[index].lmaxprio)
+        {
+          g_locks[index].lmaxprio=proctab[currpid].pprio;
+          int p=0;
+          for(;p<NPROC;p++)
+          {
+            if(g_lock_table[p][index]==HOLD)
+              chprio(p,g_locks[index].lmaxprio);
+          }
+        }
         resched();
         restore(ps);
         return proctab[currpid].pwaitret; 
@@ -96,6 +134,18 @@ int lock(int ldes, int type, int priority)
       q[currpid].qtype=type;
       if(priority>g_locks[index].lmaxw)
         g_locks[index].lmaxw=priority;
+      g_lock_table[currpid][index]=WAIT;
+      if(proctab[currpid].pprio>g_locks[index].lmaxprio)
+      {
+        g_locks[index].lmaxprio=proctab[currpid].pprio;
+        //if the max priority of this lock is changed, update all holder
+        int p=0;
+        for(;p<NPROC;p++)
+        {
+          if(g_lock_table[p][index]==HOLD)
+            chprio(p,g_locks[index].lmaxprio);
+        }
+      }
       //give out the cpu
       resched();
       restore(ps);

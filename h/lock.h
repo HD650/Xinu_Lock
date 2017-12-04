@@ -5,6 +5,9 @@
 #define READ 0
 #define WRITE 1
 
+#define HOLD 3
+#define WAIT 4
+
 #define LFREE 'f'
 #define LUSED 'u'
 

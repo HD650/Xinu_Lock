@@ -8,6 +8,9 @@
 #include <io.h>
 #include <q.h>
 #include <stdio.h>
+#include <lock.h>
+
+extern int g_lock_table[NPROC][NLOCKS];
 
 /*------------------------------------------------------------------------
  * kill  --  kill a process and remove it from the system
@@ -56,6 +59,27 @@ SYSCALL kill(int pid)
 						/* fall through	*/
 	default:	pptr->pstate = PRFREE;
 	}
+        //if a process is killed, the priority of the lock may change
+        int l=0;
+        for(;l<NLOCKS;l++)
+        {
+          //change only the lock this process wait
+          if(g_lock_table[pid][l]==WAIT)
+            if(g_locks[l].lmaxprio==proctab[pid].pprio)
+            {
+              int p=0;
+              int max=MININT;
+              for(;p<NPROC;p++)
+                if(g_lock_table[p][l]==WAIT)
+                  if(proctab[p].pprio>max||proctab[p].pprio<g_locks[l].lmaxprio)
+                    max=proctab[p].pprio;
+              g_locks[l].lmaxprio=max;
+              for(p=0;p<NPROC;p++)
+                if(g_lock_table[p][l]==HOLD)
+                  chprio(p,max);
+            }
+           
+        }
 	restore(ps);
 	return(OK);
 }

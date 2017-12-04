@@ -3,6 +3,8 @@
 #include <proc.h>
 #include <q.h>
 
+extern int g_lock_table[NPROC][NLOCKS];
+
 int releaseall(int numlocks, int ldes)
 {
   STATWORD ps;
@@ -35,6 +37,7 @@ int releaseall(int numlocks, int ldes)
       //release the writer
       g_locks[locknum].lnumw--;
       g_locks[locknum].lnumh--;
+      g_lock_table[currpid][locknum]=0;
     }
     //if it's not held by a writer, it's held by readers
     else
@@ -42,6 +45,7 @@ int releaseall(int numlocks, int ldes)
       //release a reader
       g_locks[locknum].lnumr--;
       g_locks[locknum].lnumh--;
+      g_lock_table[currpid][locknum]=0;
     }
     //if this lock is free now, wake up a process in the wait queue
     if(g_locks[locknum].lnumh==0)
@@ -58,6 +62,7 @@ int releaseall(int numlocks, int ldes)
          //dequeue this process from wait queue and ready it
           dequeue(last_proc);
           ready(last_proc,RESCHNO);
+          g_lock_table[last_proc][locknum]=HOLD;
           g_locks[locknum].lnumr++;
           g_locks[locknum].lnumh++;
           int prev_proc=q[last_proc].qprev;
@@ -72,6 +77,7 @@ int releaseall(int numlocks, int ldes)
               prev_proc=q[prev_proc].qprev;
               dequeue(temp);
               ready(temp,RESCHNO);
+              g_lock_table[prev_proc][locknum]=HOLD;
             }
             prev_proc=q[prev_proc].qprev;
           } 
@@ -81,6 +87,7 @@ int releaseall(int numlocks, int ldes)
         {
           dequeue(last_proc);
           ready(last_proc,RESCHNO);
+          g_lock_table[last_proc][locknum]=0;
           g_locks[locknum].lnumw++;
           g_locks[locknum].lnumh++;
         }
