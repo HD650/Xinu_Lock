@@ -19,8 +19,8 @@ int lcreate()
     if(g_locks[index].lstate==LFREE)
     {
       g_locks[index].lstate=LUSED;
-      g_locks[index].lid=index;
-      
+      g_locks[index].lid=g_lock_id;
+      res=g_lock_id;
       break;
     }
     //update the global lock id

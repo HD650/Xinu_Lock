@@ -64,7 +64,7 @@ int releaseall(int numlocks, int ldes)
           int temp;
           //dequeue and ready all reader in the wait queue has bigger priority than
           //the biggest writer in the queue
-          while(prev_proc!=g_locks[locknum].lqueuehead)
+          while(prev_proc!=g_locks[locknum].lqueuehead&&prev_proc!=-1)
           {
             if(q[prev_proc].qtype==READ&&q[prev_proc].qkey>g_locks[locknum].lmaxw)
             {
@@ -73,6 +73,7 @@ int releaseall(int numlocks, int ldes)
               dequeue(temp);
               ready(temp,RESCHNO);
             }
+            prev_proc=q[prev_proc].qprev;
           } 
         }
         //just wake up this write

@@ -59,13 +59,26 @@ int lock(int ldes, int type, int priority)
     {
       //if the priority is bigger than the max writing task in queue
       //this process can hold this lock
-      if(g_locks[index].lmaxw<priority)
+      if(g_locks[index].lmaxw<=priority)
       {
         g_locks[index].lholder=currpid;
         g_locks[index].lnumh++;
         g_locks[index].lnumr++;
         restore(ps);
         return OK;
+      }
+      else
+      {
+        proctab[currpid].pstate=PLWAIT;
+        proctab[currpid].pwaitret=OK;
+        //insert this process into the wait queue
+        insert(currpid,g_locks[index].lqueuehead,priority);
+        //save the job type, so when wake this process, we can change the 
+        //type of the lock
+        q[currpid].qtype=type;
+        resched();
+        restore(ps);
+        return proctab[currpid].pwaitret; 
       }
     }
   }
