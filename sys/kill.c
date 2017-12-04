@@ -61,10 +61,13 @@ SYSCALL kill(int pid)
 	}
         //if a process is killed, the priority of the lock may change
         int l=0;
-        for(;l<NLOCKS;l++)
+        for(l=0;l<NLOCKS;l++)
         {
           //change only the lock this process wait
           if(g_lock_table[pid][l]==WAIT)
+          {
+            //after the if statement, we should clear this process in table
+            g_lock_table[pid][l]=0;
             if(g_locks[l].lmaxprio==proctab[pid].pprio)
             {
               int p=0;
@@ -78,7 +81,7 @@ SYSCALL kill(int pid)
                 if(g_lock_table[p][l]==HOLD)
                   chprio(p,max);
             }
-           
+          }
         }
 	restore(ps);
 	return(OK);
