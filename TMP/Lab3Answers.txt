@@ -44,4 +44,4 @@ sem_worker_20 released lock...
 So we can see that, without priority inheritance, the worker with 25 priority preempyt the sem_worker with 20 priority, cause that the sem_work with 30 priority can't get the lock. So in the end, job with low priority run first, that's not good.
 When we use the lock system with priority inheritance, the lock will upgrade lock_work with 20 priority to 30 priority. So the lock holder will run previous than worker with 25 priority. In the end, high priority job run first, that's good.
 
-3.
+2. The bug is: First, the do_update uses a reader lock to access a critical region, but inside the lock area, it eventually do some writing jobs. Althougt the try_update tends to protect the writing operation with semaphore, but this semaphore is initialized with count 10, it's more like a reading semaphore than writing semaphore(with only 1 count). So sum these up, this program use reading mutex to protect the writing operation, this will cause multiple threads or processes to writing to the buffer in the same time, and the simultaneously writing will definitly lead to some data race.
