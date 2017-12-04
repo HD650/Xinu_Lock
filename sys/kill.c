@@ -68,6 +68,8 @@ SYSCALL kill(int pid)
           {
             //after the if statement, we should clear this process in table
             g_lock_table[pid][l]=0;
+            //also, we should remove this process from wait list
+            dequeue(pid);
             if(g_locks[l].lmaxprio==proctab[pid].pprio)
             {
               int p=0;
